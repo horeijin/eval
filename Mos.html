@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ModelEval</title>
+    <link href="src/main.css" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/c9ab076429.js" crossorigin="anonymous"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/wavesurfer.js/1.4.0/wavesurfer.min.js"></script>
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
+    <script type="text/javascript" src="src/jquery.techbytarun.excelexportjs.js"></script>
+    <script defer src="src/main.js" charset="UTF-8"></script>
+</head>
+<body>
+  <div class="topnav">
+    <a href="Mos.html">MOS</a>
+    <a href="Likert.html">Likert Scale</a>
+    <a href="Error.html">Error Count</a>
+  </div>
+  <div class="content">
+    <div>
+      <label for="Model">Model</label>
+      <input type="text" class="form-control" id="model" name="model" placeholder="모델명 입력" required />
+      <label for="Speaker">Speaker</label> 
+      <input type="text" class="form-control" id="speaker" name="speaker" placeholder="화자명 입력" required />
+      <div style="float:right;">
+        <input type="file" id="fileElem" accept="json/*" style="display:none" onchange="handleFiles(this.files)">
+        <button class="m-0 p-1" id="fileSelect" onclick="">
+          <svg viewBox="0 0 24 24" style="width: 1.5rem; height: 1.5rem; fill: currentColor;">
+            <path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"></path>
+          </svg>
+        </button>
+        <button class="m-0 p-1" id="btnExport">
+          <svg viewBox="0 0 24 24" style="width: 1.5rem; height: 1.5rem; fill: currentColor;">
+            <path d="M21.17 3.25Q21.5 3.25 21.76 3.5 22 3.74 22 4.08V19.92Q22 20.26 21.76 20.5 21.5 20.75 21.17 20.75H7.83Q7.5 20.75 7.24 20.5 7 20.26 7 19.92V17H2.83Q2.5 17 2.24 16.76 2 16.5 2 16.17V7.83Q2 7.5 2.24 7.24 2.5 7 2.83 7H7V4.08Q7 3.74 7.24 3.5 7.5 3.25 7.83 3.25M7 13.06L8.18 15.28H9.97L8 12.06L9.93 8.89H8.22L7.13 10.9L7.09 10.96L7.06 11.03Q6.8 10.5 6.5 9.96 6.25 9.43 5.97 8.89H4.16L6.05 12.08L4 15.28H5.78M13.88 19.5V17H8.25V19.5M13.88 15.75V12.63H12V15.75M13.88 11.38V8.25H12V11.38M13.88 7V4.5H8.25V7M20.75 19.5V17H15.13V19.5M20.75 15.75V12.63H15.13V15.75M20.75 11.38V8.25H15.13V11.38M20.75 7V4.5H15.13V7Z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <p></p>
+    <select id="sel" class="w-full">
+      <option value="none" style="vertical-align: middle; text-align-last: center;">===== S E L E C T =====</option>
+    </select>
+    <p></p>
+    <div id="fileList_1" class="bg-tm-white rounded-b-none rounded-md">
+      <p></p>
+    </div>
+    <p></p>
+    <div id="fileList_2" class="bg-tm-white rounded-b-none rounded-md">
+    </div>
+    <p></p>
+    <div style="height: 180px;">
+      <div class="w-full h-full text-gray-800 bg-tm-white rounded-b-none rounded-md">
+        <div class="flex flex-col h-full p-2">
+          <div class="w-full bg-gray-900">
+            <div class="flex items-center justify-between md:px-2">
+              <div class="flex gap-x-2">
+                <div class="flex">
+                  <!--<button class="text-xs m-0 p-1 bg-white text-current">
+                    Launch
+                  </button>-->
+                  <button class="m-0 p-1 bg-white" id="playPause">
+                    <span id="play">
+                      <svg ViewBox="0 0 24 24" style="width:1.5rem; height:1.5rem; fill:currentColor;" class="svelte-5lz6cm">
+                        <path d="M8,5.14V19.14L19,12.14L8,5.14Z"></path>
+                      </svg>
+                    </span>
+                    <span id="pause" style="display: none">
+                      <svg ViewBox="0 0 24 24" style="width:1.5rem; height:1.5rem; fill:currentColor;" class="svelte-5lz6cm">
+                        <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path>
+                      </svg>
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <div class="flex gap-x-1 items-center">
+                <div class="text-xs text-white">텍스트 길이 : 
+                  <span id="msg_1"></span> 자
+                </div>
+                <!--<div class="text-xs text-white">합성음 길이 : 
+                  <span id="msg_2"></span> s
+                </div>
+                <div class="text-xs text-white">평균 f0 : 
+                  <span id="msg_3"></span> Hz
+                </div>-->
+              </div>
+            </div>
+            <div id='waveform' class="w-full"></div>
+          </div>
+          <!--<div id="wave-spectrogram" class="w-full"></div>-->
+        </div>
+      </div>
+    </div>
+    <p style="height: 20px;"></p>
+    <div>
+      <div class="flex gap-x-2" style="justify-content: center;">
+        <table id="eval" class="data-table-xs data-table-horizontal data-table-highlight" style="width:50%;">
+          <thead>
+            <tr>
+              <th>1.0</th>
+              <th>1.5</th>
+              <th>2.0</th>
+              <th>2.5</th>
+              <th>3.0</th>
+              <th>3.5</th>
+              <th>4.0</th>
+              <th>4.5</th>
+              <th>5.0</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <label for="score_1.0">
+                  <input type="radio" name="score" value=1.0 />
+                </label>
+              </td>
+              <td>
+                <label for="score_1.5">
+                  <input type="radio" name="score" value=1.5 />
+                </label>
+              </td>
+              <td>
+                <label for="score_2.0">
+                  <input type="radio" name="score" value=2.0 />
+                </label>
+              </td>
+              <td>
+                <label for="score_2.5">
+                  <input type="radio" name="score" value=2.5 />
+                </label>
+              </td>
+              <td>
+                <label for="score_3.0">
+                  <input type="radio" name="score" value=3.0 />
+                </label>
+              </td>
+              <td>
+                <label for="score_3.5">
+                  <input type="radio" name="score" value=3.5 />
+                </label>
+              </td>
+              <td>
+                <label for="score_4.0">
+                  <input type="radio" name="score" value=4.0 />
+                </label>
+              </td>
+              <td>
+                <label for="score_4.5">
+                  <input type="radio" name="score" value=4.5 />
+                </label>
+              </td>
+              <td>
+                <label for="score_5.0">
+                  <input type="radio" name="score" value=5.0 />
+                </label>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <textarea class="score-input" id="note" name="score" ></textarea>
+        <div class="mg-tb">
+          <input type="button" id="addBtn" class="outline item" value="submit"/>
+        </div>
+      </div>
+      <p style="height: 50px;"></p>
+      <div>
+        <h1>MOS Score</h1>
+        <table id="myTable" class="data-table data-table-horizontal data-table-highlight" style="margin-left: auto; margin-right: auto;">
+          <thead>
+            <tr>
+              <th>Idx</th>
+              <th>Model</th>
+              <th>Speaker</th>
+              <th>file</th>
+              <th>Sentence</th>
+              <th>Length</th>
+              <th>Score</th>
+              <th>비고</th>
+              <th>Delete</th>
+            </tr>
+          </thead>
+          <tbody id="tbody">
+            
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</body>
+<footer class="centered">
+  <span>Website by Horeijin</span>
+</footer>
+</html>
